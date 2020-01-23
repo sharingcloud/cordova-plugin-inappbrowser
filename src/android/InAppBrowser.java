@@ -116,6 +116,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String HIDE_URL = "hideurlbar";
     private static final String FOOTER = "footer";
     private static final String FOOTER_COLOR = "footercolor";
+    private static final String BYPASS_SSL_CHECK = "bypassSslCheck";
     private static final String BEFORELOAD = "beforeload";
 
     private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
@@ -146,6 +147,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hideUrlBar = false;
     private boolean showFooter = false;
     private String footerColor = "";
+    private boolean bypassSslCheck = false;
     private String beforeload = "";
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
@@ -719,6 +721,10 @@ public class InAppBrowser extends CordovaPlugin {
             if (footerColorSet != null) {
                 footerColor = footerColorSet;
             }
+            String bypassSslCheckSet = features.get(BYPASS_SSL_CHECK);
+            if (bypassSslCheck != null) {
+                bypassSslCheck = bypassSslCheckSet.equals("yes") ? true : false;
+            }
             if (features.get(BEFORELOAD) != null) {
                 beforeload = features.get(BEFORELOAD);
             }
@@ -982,7 +988,7 @@ public class InAppBrowser extends CordovaPlugin {
                     }
 
                 });
-                currentClient = new InAppBrowserClient(thatWebView, edittext, beforeload);
+                currentClient = new InAppBrowserClient(thatWebView, edittext, beforeload, bypassSslCheck);
                 inAppWebView.setWebViewClient(currentClient);
                 WebSettings settings = inAppWebView.getSettings();
                 settings.setJavaScriptEnabled(true);
@@ -1163,6 +1169,7 @@ public class InAppBrowser extends CordovaPlugin {
         CordovaWebView webView;
         String beforeload;
         boolean waitForBeforeload;
+        boolean bypassSslCheck;
 
         /**
          * Constructor.
@@ -1170,11 +1177,12 @@ public class InAppBrowser extends CordovaPlugin {
          * @param webView
          * @param mEditText
          */
-        public InAppBrowserClient(CordovaWebView webView, EditText mEditText, String beforeload) {
+        public InAppBrowserClient(CordovaWebView webView, EditText mEditText, String beforeload, boolean bypassSslCheck) {
             this.webView = webView;
             this.edittext = mEditText;
             this.beforeload = beforeload;
             this.waitForBeforeload = beforeload != null;
+            this.bypassSslCheck = bypassSslCheck;
         }
 
         /**
@@ -1350,6 +1358,14 @@ public class InAppBrowser extends CordovaPlugin {
                 LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
             }
             return false;
+        }
+
+        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+            if (bypassSslCheck) {
+                handler.proceed();
+            } else {
+                super.onReceivedSslError(view, handler, error);
+            }
         }
 
 
