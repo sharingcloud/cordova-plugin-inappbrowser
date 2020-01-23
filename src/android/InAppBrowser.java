@@ -722,7 +722,7 @@ public class InAppBrowser extends CordovaPlugin {
                 footerColor = footerColorSet;
             }
             String bypassSslCheckSet = features.get(BYPASS_SSL_CHECK);
-            if (bypassSslCheck != null) {
+            if (bypassSslCheckSet != null) {
                 bypassSslCheck = bypassSslCheckSet.equals("yes") ? true : false;
             }
             if (features.get(BEFORELOAD) != null) {
