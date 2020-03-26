@@ -37,6 +37,7 @@
             'loadstart': channel.create('loadstart'),
             'loadstop': channel.create('loadstop'),
             'loaderror': channel.create('loaderror'),
+            'backbutton': channel.create('backbutton'),
             'exit': channel.create('exit'),
             'customscheme': channel.create('customscheme'),
             'message': channel.create('message')

@@ -101,6 +101,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
+    private static final String BACK_BUTTON_EVENT = "backbutton";
     private static final String MESSAGE_EVENT = "message";
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
@@ -155,6 +156,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean fullscreen = true;
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
+    private boolean _shouldCatchBackButtonEvent = false;
 
     /**
      * Executes the request and returns PluginResult.
@@ -261,6 +263,10 @@ public class InAppBrowser extends CordovaPlugin {
         }
         else if (action.equals("close")) {
             closeDialog();
+        }
+        else if (action.equals("catchBackButton")) {
+            final boolean value = args.getBoolean(0);
+            this._shouldCatchBackButtonEvent = value;
         }
         else if (action.equals("loadAfterBeforeload")) {
             if (beforeload == null) {
@@ -381,6 +387,10 @@ public class InAppBrowser extends CordovaPlugin {
      */
     public void onDestroy() {
         closeDialog();
+    }
+
+    public boolean shouldCatchBackButtonEvent() {
+        return this._shouldCatchBackButtonEvent;
     }
 
     /**
@@ -577,6 +587,9 @@ public class InAppBrowser extends CordovaPlugin {
      * Checks to see if it is possible to go back one page in history, then does so.
      */
     public void goBack() {
+        // Send message
+
+
         if (this.inAppWebView.canGoBack()) {
             this.inAppWebView.goBack();
         }
@@ -820,7 +833,7 @@ public class InAppBrowser extends CordovaPlugin {
                     dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 }
                 dialog.setCancelable(true);
-                dialog.setInAppBroswer(getInAppBrowser());
+                dialog.setInAppBrowser(getInAppBrowser());
 
                 // Main container layout
                 LinearLayout main = new LinearLayout(cordova.getActivity());
@@ -1116,6 +1129,16 @@ public class InAppBrowser extends CordovaPlugin {
      */
     private void sendUpdate(JSONObject obj, boolean keepCallback) {
         sendUpdate(obj, keepCallback, PluginResult.Status.OK);
+    }
+
+    private void sendBackButtonEvent() {
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("type", BACK_BUTTON_EVENT);
+            sendUpdate(obj, true);
+        } catch (JSONException ex) {
+            LOG.d(LOG_TAG, "Should never happen");
+        }
     }
 
     /**
