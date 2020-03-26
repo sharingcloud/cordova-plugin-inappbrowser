@@ -1131,7 +1131,7 @@ public class InAppBrowser extends CordovaPlugin {
         sendUpdate(obj, keepCallback, PluginResult.Status.OK);
     }
 
-    private void sendBackButtonEvent() {
+    public void sendBackButtonEvent() {
         try {
             JSONObject obj = new JSONObject();
             obj.put("type", BACK_BUTTON_EVENT);
