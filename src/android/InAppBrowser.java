@@ -391,11 +391,11 @@ public class InAppBrowser extends CordovaPlugin {
 
     public void onBackPressed() {
         // Override on whitelisted URL
-        if (this.whitelistedUrl) {
+        if (this.whitelistedUrl != null) {
             String currentWebUrl = this.inAppWebView.getUrl();
             String httpHostUri = "http://" + this.whitelistedUrl;
             String httpsHostUri = "https://" + this.whitelistedUrl;
-            if (url.startsWith(httpHostUri) || url.startsWith(httpsHostUri)) {
+            if (currentWebUrl.startsWith(httpHostUri) || currentWebUrl.startsWith(httpsHostUri)) {
                 // Send a backbutton event
                 this.sendBackButtonEvent();
                 return;
