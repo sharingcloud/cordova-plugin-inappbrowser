@@ -52,6 +52,7 @@ interface InAppBrowser extends Window {
      *                  passed an InAppBrowserEvent object as a parameter.
      */
     removeEventListener(type: channel, callback: InAppBrowserEventListenerOrEventListenerObject): void;
+    setWhitelistedUrl(value: string): void;
     /** Closes the InAppBrowser window. */
     close(): void;
     /** Hides the InAppBrowser window. Calling this has no effect if the InAppBrowser was already hidden. */

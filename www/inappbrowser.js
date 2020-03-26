@@ -77,8 +77,8 @@
                 this.channels[eventname].unsubscribe(f);
             }
         },
-        catchBackButton: function (value) {
-            exec(null, null, 'InAppBrowser', 'catchBackButton', [value]);
+        setWhitelistedUrl: function (value) {
+            exec(null, null, 'InAppBrowser', 'setWhitelistedUrl', [value]);
         },
 
         executeScript: function (injectDetails, cb) {

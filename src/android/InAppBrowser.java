@@ -156,7 +156,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean fullscreen = true;
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
-    private boolean _shouldCatchBackButtonEvent = false;
+    private String whitelistedUrl = null;
 
     /**
      * Executes the request and returns PluginResult.
@@ -264,9 +264,9 @@ public class InAppBrowser extends CordovaPlugin {
         else if (action.equals("close")) {
             closeDialog();
         }
-        else if (action.equals("catchBackButton")) {
-            final boolean value = args.getBoolean(0);
-            this._shouldCatchBackButtonEvent = value;
+        else if (action.equals("setWhitelistedUrl")) {
+            final String value = args.getString(0);
+            this.whitelistedUrl = value;
         }
         else if (action.equals("loadAfterBeforeload")) {
             if (beforeload == null) {
@@ -389,8 +389,26 @@ public class InAppBrowser extends CordovaPlugin {
         closeDialog();
     }
 
-    public boolean shouldCatchBackButtonEvent() {
-        return this._shouldCatchBackButtonEvent;
+    public void onBackPressed() {
+        // Override on whitelisted URL
+        if (this.whitelistedUrl) {
+            String currentWebUrl = this.inAppWebView.getUrl();
+            String httpHostUri = "http://" + this.whitelistedUrl;
+            String httpsHostUri = "https://" + this.whitelistedUrl;
+            if (url.startsWith(httpHostUri) || url.startsWith(httpsHostUri)) {
+                // Send a backbutton event
+                this.sendBackButtonEvent();
+                return;
+            }
+        }
+
+        // better to go through the in inAppBrowser
+        // because it does a clean up
+        if (this.hardwareBack() && this.canGoBack()) {
+            this.goBack();
+        }  else {
+            this.closeDialog();
+        }
     }
 
     /**
@@ -587,9 +605,6 @@ public class InAppBrowser extends CordovaPlugin {
      * Checks to see if it is possible to go back one page in history, then does so.
      */
     public void goBack() {
-        // Send message
-
-
         if (this.inAppWebView.canGoBack()) {
             this.inAppWebView.goBack();
         }
