@@ -77,6 +77,9 @@
                 this.channels[eventname].unsubscribe(f);
             }
         },
+        catchBackButton: function (value) {
+            exec(null, null, 'InAppBrowser', 'catchBackButton', [value]);
+        },
 
         executeScript: function (injectDetails, cb) {
             if (injectDetails.code) {
